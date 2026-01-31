@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta name="author" content="Anonim_Anonimov">
+  <meta name="description" content="Search Movies">
+  <meta name="keywords" content="Персональний сайт для пошуку фільмів">
+          
+  <title>Movie search</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #1c1c1c;
+    }
+
+    .left {
+      display: flex;
+      
+      gap: 10px;
+      align-items: center;
+    }
+
+    .home-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .genres button {
+      margin-right: 5px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    header input {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      width: 250px;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: 38px;
+      right: 0;
+      background: #222;
+      width: 100%;
+      border-radius: 5px;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .suggestions div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .suggestions div:hover {
+      background: #333;
+    }
+
+    
+    .movie-container {
+      display: flex;
+      gap: 20px;
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+
+    }
+
+
+
+    .movie-container img {
+      width: 250px;
+      border-radius: 10px;
+    }
+
+    .movie-info h2 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .card {
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .error {
+      text-align: center;
+      color: #ff6b6b;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="left">
+    <button class="home-btn" onclick="loadTopMovies()">🏠 Home 🏠</button>
+
+    <div class="genres">
+      <button onclick="searchGenre('Action')">Action</button>
+      <button onclick="searchGenre('Comedy')">Comedy</button>
+      <button onclick="searchGenre('Drama')">Drama</button>
+      <button onclick="searchGenre('Sci-Fi')">Sci‑Fi</button>
+    </div>
+  </div>
+  
+
+  
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Пошук фільму..." />
+    <div id="suggestions" class="suggestions"></div>
+  </div>
+</header>
+
+<div id="result"></div>
+
+<script>
+  const API_KEY = "b5f0a15f";
+
+  const input = document.getElementById("searchInput");
+  const result = document.getElementById("result");
+  const suggestionsBox = document.getElementById("suggestions");
+
+  const topMovies = [
+    "The Shawshank Redemption",
+    "The Godfather",
+    "The Dark Knight",
+    "Forrest Gump",
+    "Inception",
+    "Interstellar"
+  ];
+
+  
+  function loadTopMovies() {
+    result.innerHTML = '<div class="grid" id="topGrid"></div>';
+    const grid = document.getElementById('topGrid');
+
+    topMovies.forEach(title => {
+      fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.Response === "True") {
+            grid.innerHTML += `
+              <div class="card" onclick="searchMovie('${data.Title}')">
+                <img src="${data.Poster}" alt="${data.Title}">
+                <p>${data.Title} (${data.Year})</p>
+              </div>`;
+          }
+        });
+    });
+  }
+
+  loadTopMovies();
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      searchMovie(input.value);
+      suggestionsBox.innerHTML = "";
+    }
+  });
+
+  input.addEventListener("input", () => {
+    const q = input.value;
+    if (q.length < 3) {
+      suggestionsBox.innerHTML = "";
+      return;
+    }
+
+    fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(q)}&apikey=${API_KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.Search) return;
+
+        suggestionsBox.innerHTML = data.Search.slice(0, 5)
+          .map(movie => `<div onclick="selectSuggestion('${movie.Title}')">${movie.Title} (${movie.Year})</div>`)
+          .join('');
+      });
+  });
+
+  function selectSuggestion(title) {
+    input.value = title;
+    suggestionsBox.innerHTML = "";
+    searchMovie(title);
+  }
+
+  function searchMovie(title) {
+    if (!title) return;
+
+    fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${API_KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.Response === "False") {
+          result.innerHTML = `<p class="error">Фільм не знайдено</p>`;
+          return;
+        }
+
+        result.innerHTML = `
+          <div class="movie-container">
+            <img src="${data.Poster}" alt="Постер">
+            <div class="movie-info">
+              <h2>${data.Title} (${data.Year})</h2>
+              <p><b>Жанр:</b> ${data.Genre}</p>
+              <p><b>Опис:</b> ${data.Plot}</p>
+              <p><b>Актори:</b> ${data.Actors.split(', ').map(actor => `<a href="https://uk.wikipedia.org/wiki/${actor.replace(/ /g,'_')}" target="_blank" style="color:#6ab0ff">${actor}</a>`).join(', ')}</p>
+              <p><b>IMDb:</b> ⭐ ${+data.imdbRating + 2} </p>
+            </div>
+          </div>`;
+      });
+  }
+
+  function searchGenre(genre) {
+    fetch(`https://www.omdbapi.com/?s=${genre}&type=movie&apikey=${API_KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.Search) return;
+
+        result.innerHTML = `<div class="grid">${data.Search.map(m => `
+          <div class="card" onclick="searchMovie('${m.Title}')">
+            <img src="${m.Poster}">
+            <p>${m.Title}</p>
+          </div>`).join('')}</div>`;
+      });
+  }
+</script>
+
+</body>
+</html>
