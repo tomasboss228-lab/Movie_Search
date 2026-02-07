@@ -1,0 +1,159 @@
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: black;
+  color: #eaeaea;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(15,15,15,0.95);
+  border-bottom: 1px solid #222;
+}
+
+.logo {
+  margin: 0;
+  color: #f5c518;
+}
+
+.left, .right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  background: #f5c518;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  background: #ffd84d;
+}
+
+.search-box {
+  display: flex;
+  position: relative;
+}
+
+.search-box input {
+  background: #111;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 7px 10px;
+  border-radius: 6px 0 0 6px;
+}
+
+#searchBtn {
+  background: #00e054;
+  border-radius: 0 6px 6px 0;
+}
+
+#searchBtn.animate {
+  animation: pulse 0.3s;
+}
+
+@keyframes pulse {
+  50% { transform: scale(1.15); }
+}
+
+.suggestions {
+  position: absolute;
+  top: 36px;
+  width: 100%;
+  background: #1c1c1c;
+  border-radius: 6px;
+  z-index: 10;
+}
+
+.suggestions div {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.suggestions div:hover {
+  background: #333;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 22px;
+  padding: 30px;
+}
+
+.card {
+  position: relative;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+}
+
+.card p {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.movie-container {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  max-width: 900px;
+  margin: auto;
+  background: rgba(20,20,20,0.9);
+  border-radius: 16px;
+}
+
+.movie-container img {
+  width: 260px;
+  border-radius: 12px;
+}
+
+.profile {
+  background: #111;
+}
+
+.hidden {
+  display: none;
+}
+.card p {
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+  padding: 6px;
+  border-radius: 0 0 12px 12px;
+}
+
+.movie-container button {
+  margin-top: 12px;
+  background: #f5c518;
+  font-size: 14px;
+}
+
+.movie-container button:hover {
+  background: #ffd84d;
+}
